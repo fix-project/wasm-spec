@@ -6,3 +6,4 @@ let dry = ref false
 let width = ref 80
 let harness = ref true
 let use_isa = ref false
+let print_isa = ref false

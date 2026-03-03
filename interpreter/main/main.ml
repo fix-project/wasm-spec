@@ -32,7 +32,8 @@ let argspec = Arg.align
   "-d", Arg.Set Flags.dry, " dry, do not run program";
   "-t", Arg.Set Flags.trace, " trace execution";
   "-v", Arg.Unit banner, " show version";
-  "-isa", Arg.Set Flags.use_isa, " use extracted Isabelle implementation"
+  "-isa", Arg.Set Flags.use_isa, " use extracted Isabelle implementation";
+  "-pisa", Arg.Set Flags.print_isa, " print out extracted Isabelle definition"
 ]
 
 let () =

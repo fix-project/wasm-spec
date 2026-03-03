@@ -27,6 +27,14 @@ Features implemented by deferring to the base interpreter axiomatically in the f
 
 Original readme follows...
 
+# Generate Isabelle definition
+
+A new command-line fag has been added, `-pisa`, which will use the provided harness to convert WebAssembly modules to the corresponding Isabelle AST that represents the global store instance after the input module is instantiated. Note that it currently only supports a subset of WebAssembly instructions and only function imports from fixpoint API.
+
+```shell
+./wasm -pisa input.wat 
+```
+
 -----
 
 # WebAssembly Reference Interpreter

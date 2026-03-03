@@ -337,7 +337,7 @@ let rec convert_instr instr =
         | Ast.RefFunc x -> Ref_func (var_to_nat x)
         | Ast.RefIsNull -> Ref_is_null
         | Ast.RefNull t -> Ref_null (convert_t_ref t)
-        | Ast.MemoryFill -> Memory_fill 
+        | Ast.MemoryFill -> Memory_fill
         | Ast.MemoryInit x -> Memory_init (var_to_nat x)
         | Ast.MemoryCopy -> Memory_copy
         | Ast.TableGet x -> Table_get (var_to_nat x)
@@ -481,5 +481,3 @@ let convert_module (modul : Ast.module_') : unit m_ext =
   let m_imports = List.map convert_import imports in
   let m_exports = List.map convert_export exports in
   M_ext (m_types, m_funcs, m_tabs,m_mems, m_globs, m_elem, m_data, m_start, m_imports, m_exports, ())
-
-

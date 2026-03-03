@@ -310,11 +310,9 @@ let exports_isa : ((string * WasmRef_Isa.v_ext) list) Map_isa.t ref = ref Map_is
 let store_isa = ref (WasmRef_Isa.S_ext ([],[],[],[],[],[],()))
 
 let configure_isa () =
-  let (s', spectest_exports) = Spectest_isa.install_spectest_isa !store_isa in
-  let (s'', env_exports) = Env_isa.install_env_isa s' in
-  store_isa := s'';
-  exports_isa := Map_isa.add "spectest" spectest_exports !exports_isa;
-  exports_isa := Map_isa.add "env" env_exports !exports_isa
+  let (s', fixpoint_exports) = Fixpoint_isa.install_fixpoint_isa !store_isa in
+  store_isa := s';
+  exports_isa := Map_isa.add "fixpoint" fixpoint_exports !exports_isa
 
 let m_name_isa x_opt =
   match x_opt with
@@ -616,6 +614,28 @@ let run_assertion ass =
     | _ -> Assert.error ass.at "expected exhaustion error"
     )
 
+let generate_isabelle_module m_isa =
+  trace "generate isabelle module...";
+
+  trace "verify imports";
+  List.iter (fun import ->
+    match import with
+    | WasmRef_Isa.Module_import_ext (s1, s2, (WasmRef_Isa.Imp_func _), _) ->
+        if not (s1 = "fixpoint") then failwith "Illegal import"
+    | _ -> failwith "Illegal import")
+  (WasmRef_Isa.m_imports m_isa);
+
+  let imports_isa = List.map match_import_isa (WasmRef_Isa.m_imports m_isa) in
+  (match WasmRef_Isa.interp_instantiate_init !store_isa m_isa imports_isa with
+    | (s', WasmRef_Isa.RI_res(inst, exps, _)) ->
+        trace "Initializing...";
+        Printf.printf "definition init :: \"s\" where \"init = \n";
+        Printing.pp_s_ext (Format.std_formatter) (WasmRef_Isa.m_imports m_isa) s';
+        Printf.printf "\"\n";
+        flush_all ()
+    | (s',_) -> store_isa := s'; failwith "(Isabelle) instantiation failure"
+  )
+
 let rec run_command cmd =
   match cmd.it with
   | Module (x_opt, def) ->
@@ -623,41 +643,47 @@ let rec run_command cmd =
     let m = run_definition def in
     bind scripts x_opt [cmd];
     bind modules x_opt m;
-    (if !Flags.use_isa then
-       try
-         (let m_isa = Ast_convert.convert_module m.it in
-          if not !Flags.unchecked then begin
-            trace "Checking...";
-            Valid.check_module_isa m_isa;
-            if !Flags.print_sig then failwith "NYI"
-          end;
-          if not !Flags.dry then begin
-            let imports_isa = List.map match_import_isa (WasmRef_Isa.m_imports m_isa) in
-            (match WasmRef_Isa.interp_instantiate_init !store_isa m_isa imports_isa with
-              | (s', WasmRef_Isa.RI_res(inst, exps, _)) ->
-                  store_isa := s';
-                  trace "Initializing...";
-                  bind_isa exports_isa x_opt (List.map (fun x -> WasmRef_Isa.(e_name x, e_desc x)) exps)
-              | (s',_) -> store_isa := s'; failwith "(Isabelle) instantiation failure"
-            )
-          end)
-       with
-       | e -> trace ("(Isabelle) module processing error at " ^ (string_of_region cmd.at)); raise e
+    (if !Flags.print_isa then
+      (let m_isa = Ast_convert.convert_module m.it in
+      generate_isabelle_module m_isa)
     else
-      (if not !Flags.unchecked then begin
-        trace "Checking...";
-        Valid.check_module m;
-        if !Flags.print_sig then begin
-          trace "Signature:";
-          print_module x_opt m
-        end
-      end;
-      if not !Flags.dry then begin
-        trace "Initializing...";
-        let imports = Import.link m in
-        let inst = Eval.init m imports in
-        bind instances x_opt inst
-      end))
+      (if !Flags.use_isa then
+         try
+           (let m_isa = Ast_convert.convert_module m.it in
+            if not !Flags.unchecked then begin
+              trace "Checking...";
+              Valid.check_module_isa m_isa;
+              if !Flags.print_sig then failwith "NYI"
+            end;
+            if not !Flags.dry then begin
+              let imports_isa = List.map match_import_isa (WasmRef_Isa.m_imports m_isa) in
+              (match WasmRef_Isa.interp_instantiate_init !store_isa m_isa imports_isa with
+                | (s', WasmRef_Isa.RI_res(inst, exps, _)) ->
+                    store_isa := s';
+                    trace "Initializing...";
+                    bind_isa exports_isa x_opt (List.map (fun x -> WasmRef_Isa.(e_name x, e_desc x)) exps)
+                | (s',_) -> store_isa := s'; failwith "(Isabelle) instantiation failure"
+              )
+            end)
+         with
+         | e -> trace ("(Isabelle) module processing error at " ^ (string_of_region cmd.at)); raise e
+      else
+        (if not !Flags.unchecked then begin
+          trace "Checking...";
+          Valid.check_module m;
+          if !Flags.print_sig then begin
+            trace "Signature:";
+            print_module x_opt m
+          end
+        end;
+        if not !Flags.dry then begin
+          trace "Initializing...";
+          let imports = Import.link m in
+          let inst = Eval.init m imports in
+          bind instances x_opt inst
+        end)
+      )
+    )
 
   | Register (name, x_opt) ->
     quote := cmd :: !quote;
