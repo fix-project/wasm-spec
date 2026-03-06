@@ -336,7 +336,7 @@ let rec pp_cl_list fmt (import_list: unit module_import_ext list) = function
                  | i :: is ->
                      match i with
                      | Module_import_ext (s1, s2, (Imp_func n), _) ->
-                         Format.fprintf fmt "(Host_func %s)),\n" s2; is
+                         Format.fprintf fmt "(Host_func %s_%s)),\n" s1 s2; is
                      | _ -> failwith "Incorrect import type")
              | Host_ref i -> Format.fprintf fmt "(Host_ref %ld)),\n" i; import_list
          in
