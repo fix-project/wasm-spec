@@ -625,6 +625,19 @@ let generate_isabelle_module m_isa =
     | _ -> failwith "Illegal import")
   (WasmRef_Isa.m_imports m_isa);
 
+  trace "list exports";
+  List.iter (fun export ->
+    match export with
+    | WasmRef_Isa.Module_export_ext (s1, s2, _) ->
+        (match s2 with
+         | WasmRef_Isa.Ext_func i -> Printf.printf "definition func_%s_idx :: nat where \"func_%s_idx = %d\"\n" s1 s1 (WasmRef_Isa.nat_to_ocaml_int i); ()
+         | WasmRef_Isa.Ext_tab i -> Printf.printf "definition tab_%s_idx :: nat where \"tab_%s_idx = %d\"\n" s1 s1 (WasmRef_Isa.nat_to_ocaml_int i); ()
+         | WasmRef_Isa.Ext_mem i -> Printf.printf "definition mem_%s_idx :: nat where \"mem_%s_idx = %d\"\n" s1 s1 (WasmRef_Isa.nat_to_ocaml_int i); ()
+         | WasmRef_Isa.Ext_glob i -> Printf.printf "definition glob_%s_idx :: nat where \"glob_%s_idx = %d\"\n" s1 s1 (WasmRef_Isa.nat_to_ocaml_int i); ()
+    )
+    | _ -> failwith "Illegal import")
+  (WasmRef_Isa.m_exports m_isa);
+
   let imports_isa = List.map match_import_isa (WasmRef_Isa.m_imports m_isa) in
   (match WasmRef_Isa.interp_instantiate_init !store_isa m_isa imports_isa with
     | (s', WasmRef_Isa.RI_res(inst, exps, _)) ->
