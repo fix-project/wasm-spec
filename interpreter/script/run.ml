@@ -643,7 +643,8 @@ let generate_isabelle_module m_isa =
     | (s', WasmRef_Isa.RI_res(inst, exps, _)) ->
         trace "Initializing...";
         Printf.printf "definition init :: \"s\" where \"init = \n";
-        Printing.pp_s_ext (Format.std_formatter) (WasmRef_Isa.m_imports m_isa) s';
+        let (fixpoint_names, _) =  List.split Fixpoint_isa.fixpoint_imports in
+        Printing.pp_s_ext (Format.std_formatter) fixpoint_names s';
         Printf.printf "\"\n";
         flush_all ()
     | (s',_) -> store_isa := s'; failwith "(Isabelle) instantiation failure"

@@ -319,12 +319,12 @@ let pp_cl_native fmt inst_ext tf t be =
   pp_list pp_be fmt be;
   Format.fprintf fmt ")"
 
-let rec pp_cl_list fmt (import_list: unit module_import_ext list) = function
+let rec pp_cl_list fmt (import_list: string list) = function
   | [] -> ()
   | x :: xs ->
       let new_import_list =
          match x with
-         | Func_native (inst_ext, tf, t, be) -> pp_cl_native fmt inst_ext tf t be; import_list
+         | Func_native (inst_ext, tf, t, be) -> pp_cl_native fmt inst_ext tf t be; if not (xs = []) then Format.fprintf fmt ",\n"; import_list
          | Func_host (tf, host) ->
              Format.fprintf fmt "(Func_host ";
              pp_tf fmt tf;
@@ -334,10 +334,7 @@ let rec pp_cl_list fmt (import_list: unit module_import_ext list) = function
                  (match import_list with
                  | [] -> failwith "Out of import entries"
                  | i :: is ->
-                     match i with
-                     | Module_import_ext (s1, s2, (Imp_func n), _) ->
-                         Format.fprintf fmt "(Host_func %s_%s)),\n" s1 s2; is
-                     | _ -> failwith "Incorrect import type")
+                     Format.fprintf fmt "(Host_func fixpoint_%s)),\n" i; is)
              | Host_ref i -> Format.fprintf fmt "(Host_ref %ld)),\n" i; import_list
          in
       pp_cl_list fmt new_import_list xs
