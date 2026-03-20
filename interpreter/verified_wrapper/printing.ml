@@ -122,7 +122,7 @@ let pp_v_vec fmt (v : v_vec) : unit =
 let pp_v_ref fmt = function
   | ConstNull tref -> Format.fprintf fmt "(ConstNull "; pp_t_ref fmt tref; Format.fprintf fmt ")"
   | (ConstRefExtern (Host_ref x)) -> Format.fprintf fmt "(ConstRefExtern (Host_ref %ld))" x
-  | _ -> failwith "Unimplemented"
+  | (ConstRefFunc i) -> Format.fprintf fmt "(ConstRefFunc "; pp_nat fmt i; Format.fprintf fmt ")"
 
 let pp_v fmt = function
   | V_num n -> Format.fprintf fmt "(V_num "; pp_v_num fmt n; Format.fprintf fmt ")"
@@ -133,12 +133,12 @@ let pp_testop fmt = function
   | Eqz -> Format.fprintf fmt "Eqz"
 
 let pp_relop_i fmt = function
-  | Eq -> Format.fprintf fmt "Eq"
-  | Ne -> Format.fprintf fmt "Ne"
-  | (Lt s) -> Format.fprintf fmt "(Lt "; pp_sx fmt s; Format.fprintf fmt ")"
-  | (Gt s) -> Format.fprintf fmt "(Gt "; pp_sx fmt s; Format.fprintf fmt ")"
-  | (Le s) -> Format.fprintf fmt "(Le "; pp_sx fmt s; Format.fprintf fmt ")"
-  | (Ge s) -> Format.fprintf fmt "(Ge "; pp_sx fmt s; Format.fprintf fmt ")"
+  | Eq -> Format.fprintf fmt "relop_i.Eq"
+  | Ne -> Format.fprintf fmt "relop_i.Ne"
+  | (Lt s) -> Format.fprintf fmt "(relop_i.Lt "; pp_sx fmt s; Format.fprintf fmt ")"
+  | (Gt s) -> Format.fprintf fmt "(relop_i.Gt "; pp_sx fmt s; Format.fprintf fmt ")"
+  | (Le s) -> Format.fprintf fmt "(relop_i.Le "; pp_sx fmt s; Format.fprintf fmt ")"
+  | (Ge s) -> Format.fprintf fmt "(relop_i.Ge "; pp_sx fmt s; Format.fprintf fmt ")"
 
 let pp_relop_f fmt = function
   | Eqf -> Format.fprintf fmt "Eqf"
@@ -234,6 +234,12 @@ let rec pp_be fmt = function
   | Call i ->
       Format.fprintf fmt "(Call ";
       pp_nat fmt i;
+      Format.fprintf fmt ")"
+  | Call_indirect (i, j) ->
+      Format.fprintf fmt "(Call_indirect ";
+      pp_nat fmt i;
+      Format.fprintf fmt " ";
+      pp_nat fmt j;
       Format.fprintf fmt ")"
   | Local_get i ->
       Format.fprintf fmt "(Local_get ";
@@ -344,13 +350,13 @@ let pp_limit_t fmt = function
       Format.fprintf fmt "\\<lparr> l_min = ";
       pp_nat fmt min;
       Format.fprintf fmt ", l_max = ";
-      match max with
+      (match max with
       | Some max ->
           Format.fprintf fmt "(Some ";
           pp_nat fmt max;
           Format.fprintf fmt ")"
       | None ->
-          Format.fprintf fmt "None"
+          Format.fprintf fmt "None")
           ;
       Format.fprintf fmt "\\<rparr>"
 

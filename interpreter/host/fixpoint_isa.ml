@@ -4,27 +4,33 @@
 
 open WasmRef_Isa.WasmRef_Isa
 
-let is_equal: host =
+let ref_ref_to_i32: host =
   Host_func (Abs_host_func (fun (s, vs) -> Some (s, [V_num (ConstInt32 (I32_impl_abs 666l))])))
 
-let is_storage_coupon_api: host =
+let ref_to_i32: host =
   Host_func (Abs_host_func (fun (s, vs) -> Some (s, [V_num (ConstInt32 (I32_impl_abs 666l))])))
 
-let get_coupon_lhs: host =
+let ref_to_ref: host =
   Host_func (Abs_host_func (fun (s, vs) -> Some (s, vs)))
 
-let get_coupon_rhs: host =
+let ref_ref_to_ref: host =
   Host_func (Abs_host_func (fun (s, vs) -> Some (s, vs)))
 
-let create_eq_coupon: host =
+let ref_i32_to_ref: host =
   Host_func (Abs_host_func (fun (s, vs) -> Some (s, vs)))
 
 let fixpoint_imports =
-  [("is_equal", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_num T_i32]), is_equal));
-   ("is_storage_coupon_api", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), is_storage_coupon_api));
-   ("get_coupon_lhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), get_coupon_lhs));
-   ("get_coupon_rhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), get_coupon_rhs));
-   ("create_eq_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), create_eq_coupon))
+  [("is_equal", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_num T_i32]), ref_ref_to_i32));
+   ("is_storage_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_force_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_eq_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("create_thunk", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("create_encode", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("get_coupon_lhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("get_coupon_rhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("create_eq_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), ref_ref_to_ref));
+   ("get_tree_size", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("get_tree_data", Func_host (Tf ([T_ref T_ext_ref; T_num T_i32], [T_ref T_ext_ref]), ref_i32_to_ref))
   ]
 
 let install_fixpoint_funcs (s : unit s_ext) : (unit s_ext * ((string * v_ext) list)) =
