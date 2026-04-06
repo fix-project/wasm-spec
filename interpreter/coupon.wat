@@ -22,7 +22,7 @@
         local.get 1
       )
     ))
- (func $make_blob_coupon (export "make_blob_coupon") (param $lhs externref) (param $rhs externref) (result externref) (local $c externref)
+ (func $make_storage_coupon (export "make_storage_coupon") (param $lhs externref) (param $rhs externref) (result externref) (local $c externref)
     (local.set $c (table.get $coupons (i32.const 0)))
     (call $is_storage_coupon (local.get $c))
     (if (result externref)
@@ -377,7 +377,7 @@
         unreachable
       )
     ))
- (table $dispatch_table funcref (elem (ref.func $make_blob_coupon)
+ (table $dispatch_table funcref (elem (ref.func $make_storage_coupon)
                                       (ref.func $make_tree_coupon)
                                       (ref.func $make_thunk_coupon)
                                       (ref.func $make_thunktree_coupon)
