@@ -24,13 +24,23 @@ let fixpoint_imports =
    ("is_storage_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
    ("is_force_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
    ("is_eq_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
-   ("create_thunk", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
-   ("create_encode", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("is_eval_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_apply_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_think_coupon", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("create_application_thunk", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("create_strict_encode", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
+   ("create_shallow_encode", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
    ("get_coupon_lhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
    ("get_coupon_rhs", Func_host (Tf ([T_ref T_ext_ref], [T_ref T_ext_ref]), ref_to_ref));
    ("create_eq_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), ref_ref_to_ref));
+   ("create_eval_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), ref_ref_to_ref));
+   ("create_think_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), ref_ref_to_ref));
+   ("create_force_coupon", Func_host (Tf ([T_ref T_ext_ref; T_ref T_ext_ref], [T_ref T_ext_ref]), ref_ref_to_ref));
    ("get_tree_size", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
-   ("get_tree_data", Func_host (Tf ([T_ref T_ext_ref; T_num T_i32], [T_ref T_ext_ref]), ref_i32_to_ref))
+   ("get_tree_data", Func_host (Tf ([T_ref T_ext_ref; T_num T_i32], [T_ref T_ext_ref]), ref_i32_to_ref));
+   ("is_blob_obj", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_data", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32));
+   ("is_object", Func_host (Tf ([T_ref T_ext_ref], [T_num T_i32]), ref_to_i32))
   ]
 
 let install_fixpoint_funcs (s : unit s_ext) : (unit s_ext * ((string * v_ext) list)) =
